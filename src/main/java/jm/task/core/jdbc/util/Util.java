@@ -36,7 +36,7 @@ public class Util {
         properties.setProperty("hibernate.connection.username", "root");
         properties.setProperty("hibernate.connection.password", "1234");
         properties.setProperty("hibernate.show_sql", "com.mysql.jdbc.Driver");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"); 
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
 
         Configuration configuration = new Configuration().addAnnotatedClass(User.class);
