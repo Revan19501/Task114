@@ -11,93 +11,110 @@ import org.hibernate.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hibernate.resource.transaction.spi.TransactionStatus.ACTIVE;
+
 public class UserDaoHibernateImpl implements UserDao {
-    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS users (id BIGINT AUTO_INCREMENT,  " +
-            "name VARCHAR(80), lastName VARCHAR(100), " +
-            "age TINYINT (100), " +
-            "PRIMARY KEY (id));";
-    Util util = new Util();
-    SessionFactory sf = util.getFactory();
+
+    private Util util = new Util();
+    private SessionFactory sf = util.getFactory();
 
     public UserDaoHibernateImpl() {
 
     }
 
     public void createUsersTable() {
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
-            session.beginTransaction();
-            session.createNativeQuery(CREATE_TABLE).executeUpdate();
-            session.getTransaction().commit();
-        }catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
+            transaction = session.getTransaction();
+            transaction.begin();
+            session.createNativeQuery("CREATE TABLE IF NOT EXISTS users (id BIGINT AUTO_INCREMENT,  " +
+                            "name VARCHAR(80), lastName VARCHAR(100), " +
+                            "age TINYINT (100), " +
+                            "PRIMARY KEY (id));")
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                transaction.rollback();
+            }
         }
     }
 
 
     public void dropUsersTable() {
+        Transaction transaction = sf.openSession().getTransaction();
         try (Session session = sf.openSession()) {
-            session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             session.createNativeQuery("DROP TABLE IF EXISTS users;").executeUpdate();
-            session.getTransaction().commit();
-        }catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                transaction.rollback();
+            }
         }
 
     }
 
 
     public void saveUser(String name, String lastName, byte age) {
-
-        try (Session session = sf.openSession()){
-            session.beginTransaction();
+        Transaction transaction = sf.openSession().getTransaction();
+        try (Session session = sf.openSession()) {
+            transaction = session.getTransaction();
+            transaction.begin();
             session.save(new User(name, lastName, age));
-            System.out.println("User с именем " + name + " добавлен в базу данных");
-            session.getTransaction().commit();
-        }catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                transaction.rollback();
+            }
         }
     }
 
     public void removeUserById(long id) {
+        Transaction transaction = sf.openSession().getTransaction();
         try (Session session = sf.openSession()) {
-            session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             User user = session.get(User.class, id);
             System.out.println("Удаляем прользователя: " + user.getName() + " " + user.getLastName());
             session.delete(user);
-            session.getTransaction().commit();
-        }catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                transaction.rollback();
+            }
         }
     }
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-
+        Transaction transaction = sf.openSession().getTransaction();
         try (Session session = sf.openSession()) {
-            session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             users = session.createQuery("from User").list();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
-            System.out.println("Такой таблицы нет");
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                System.out.println("Такой таблицы нет");
+                transaction.rollback();
+            }
         }
         return users;
     }
 
     public void cleanUsersTable() {
-
+        Transaction transaction = sf.openSession().getTransaction();
         try (Session session = sf.openSession()) {
-            session.beginTransaction();
+            transaction = session.getTransaction();
+            transaction.begin();
             session.createQuery("delete User").executeUpdate();
-            session.getTransaction().commit();
-        }catch (Exception e) {
-            Transaction transaction = sf.openSession().getTransaction();
-            transaction.rollback();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction == null || transaction.getStatus() == ACTIVE) {
+                transaction.rollback();
+            }
         }
     }
 }
