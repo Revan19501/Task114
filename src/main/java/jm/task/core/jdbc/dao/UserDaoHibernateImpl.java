@@ -42,7 +42,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
 
     public void dropUsersTable() {
-        Transaction transaction = sf.openSession().getTransaction();
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
@@ -58,7 +58,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
 
     public void saveUser(String name, String lastName, byte age) {
-        Transaction transaction = sf.openSession().getTransaction();
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
@@ -72,7 +72,7 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        Transaction transaction = sf.openSession().getTransaction();
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
@@ -89,7 +89,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        Transaction transaction = sf.openSession().getTransaction();
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
@@ -105,7 +105,7 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        Transaction transaction = sf.openSession().getTransaction();
+        Transaction transaction = null;
         try (Session session = sf.openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
